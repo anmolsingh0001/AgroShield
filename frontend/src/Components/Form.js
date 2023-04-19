@@ -72,7 +72,7 @@ function Form() {
 
   const checkfield=(e)=>{
     e.preventDefault()
-    if(Crop!=="" && medicine!=="" && type!=="" && name!=="" && (image!=="" || selectedFile) && diseasename!==""){
+    if(Crop!=="" && medicine!=="" && type!=="" && name!=="" && (image!=="" || selectedFile!=="") && diseasename!==""){
 
       const fileExtension = image.split('.').pop().toLowerCase();
       console.log(fileExtension);
@@ -95,12 +95,13 @@ function Form() {
           .catch(error => console.error(error));
           
           }
+          else{
+            console.log('Image extension is invalid');
+            alert('only png and jpg extension is supported and length should be not greater than 100 charecters');
+            setimage('');
+          }
       }
-      else{
-        console.log('Image extension is invalid');
-        alert('only png and jpg extension is supported and length should be not greater than 100 charecters');
-        setimage('');
-      }
+      
 
 
 
