@@ -52,7 +52,7 @@ function Data() {
     },[])
 
     const API=process.env.REACT_APP_SECRET_KEY+ `/image/${id}`
-    const createlink=process.env.REACT_APP_SECRET_KEY+'/createUser'
+    const createlink=process.env.REACT_APP_SECRET_KEY+'/createlink'
 
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -64,7 +64,7 @@ function Data() {
         if(imagelink!==' '){
 
             const formData = new FormData();
-  formData.append('profileImage', selectedFile);
+  formData.append('cropImage', selectedFile);
 formData.append('imageUrl', `${imagelink}`);
 
 

@@ -65,7 +65,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
-const userRef = admin.firestore().collection("users");
+// const userRef = admin.firestore().collection("users");
 
 const storage = new Storage({
   credentials: adminJsonContents,
@@ -305,7 +305,7 @@ app.put("/image/:id",middleware, async (req, res) => {
   })
 
 
-  app.post('/createUser', async (req, res) => {
+  app.post('/createlink', async (req, res) => {
     const form = new formidable.IncomingForm({ multiples: true });
   
   
@@ -317,7 +317,7 @@ app.put("/image/:id",middleware, async (req, res) => {
           'https://firebasestorage.googleapis.com/v0/b/agroshield-4560f.appspot.com/o/';
   
         let imageUrl;
-        const docID = userRef.doc().id;
+        // const docID = userRef.doc().id;
         
   
         if (err) {
@@ -336,10 +336,10 @@ app.put("/image/:id",middleware, async (req, res) => {
         const bucket = storage.bucket('gs://agroshield-4560f.appspot.com');
   
         // Check if profileImage field is present in the form data
-        if (files.profileImage && files.profileImage.size > 0) {
-          const profileImage = files.profileImage;
-          const imageResponse = await bucket.upload(profileImage.path, {
-            destination: `users/${profileImage.name}`,
+        if (files.cropImage && files.cropImage.size > 0) {
+          const cropImage = files.cropImage;
+          const imageResponse = await bucket.upload(cropImage.path, {
+            destination: `users/${cropImage.name}`,
             resumable: true,
             metadata: {
               metadata: {
@@ -347,6 +347,8 @@ app.put("/image/:id",middleware, async (req, res) => {
               },
             },
           });
+
+          
   
           imageUrl =
             downLoadPath +
@@ -365,6 +367,7 @@ app.put("/image/:id",middleware, async (req, res) => {
           async function saveImage(url, path, callback) {
             const fullUrl = url;
             const localPath = fs.createWriteStream(path);
+            
           
             const request = https.get(fullUrl,  function(res) {
               res.pipe(localPath);

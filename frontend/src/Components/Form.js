@@ -66,17 +66,19 @@ function Form() {
 
 
 
-  const createlink=process.env.REACT_APP_SECRET_KEY+'/createUser'
+
+
+  const createlink=process.env.REACT_APP_SECRET_KEY+'/createlink'
 
   const checkfield=(e)=>{
     e.preventDefault()
     if(Crop!=="" && medicine!=="" && type!=="" && name!=="" && (image!=="" || selectedFile) && diseasename!==""){
 
-      const fileExtension = image.split('.').pop();
+      const fileExtension = image.split('.').pop().toLowerCase();
       console.log(fileExtension);
-      if(fileExtension === "jpg" || fileExtension === "png" || fileExtension === "jpeg"){
+      if((fileExtension === "jpg" || fileExtension === "png") && image.length < 100 ){
         const formData = new FormData();
-        formData.append('profileImage', selectedFile);
+        formData.append('cropImage', selectedFile);
       formData.append('imageUrl', `${image}`);
 
 
@@ -95,8 +97,11 @@ function Form() {
           }
       }
       else{
-        alert('Image extension shoould be jpg,jpeg or png')
+        console.log('Image extension is invalid');
+        alert('only png and jpg extension is supported and length should be not greater than 100 charecters');
+        setimage('');
       }
+
 
 
 
@@ -185,7 +190,7 @@ function Form() {
 
             <FormControl mb={'10'} >
               <FormLabel fontSize={'20px'} >Disease Image</FormLabel>
-              <Input onChange={(e)=>setimage(e.target.value)} h={'16'} size={'lg'} type={'text'}  placeholder="Paste the image link here..." />
+              <Input value={image} onChange={(e)=>setimage(e.target.value)} h={'16'} size={'lg'} type={'text'}  placeholder="Paste the image link here..." />
             </FormControl>
 
             <FormControl mb={'10'} >
