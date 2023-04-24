@@ -107,7 +107,7 @@ function Home(props) {
        
       }
 
-      const email=jwtDecode("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFubW9sLnNpbmdoQGthbHZpdW0uY29tbXVuaXR5IiwicGFzc3dvcmQiOiIkMmEkMTAkekJRb093ZHhIT3lRLkNodldRTS9WZWpqeUNGSFFUelprMk55NVpzVDFERkVjbThKMUxxY1ciLCJuYW1lIjoiQW5tb2wgU2luZ2giLCJpc0FkbWluIjp0cnVlLCJfaWQiOiI2NDQ1ZmI2ZmM2ODA3YjNlNTkwZmFiMTQiLCJpYXQiOjE2ODIzMDg2NDV9.cdIWGjAUtOtANvzwXd1R5gYMJaz3j8GNrYRaWkuxCNY");
+      const email=jwtDecode(Token);
       // console.log("decode",email);
 
 
@@ -255,7 +255,7 @@ setTimeout(()=>{
                 <Card   boxShadow='2xl' p='6' rounded='md' bg='white' key={index} maxW='350px'>
                   
                 {
-                  (email.isAdmin)?
+                  (email.isAdmin===true)?
                   <Flex>
                     <Flex ml={'5rem'}>
                     <Button onClick={()=>Edit(dat._id)} fontSize={'1.5rem'}  h={'4rem'} w={'10rem'} >Edit</Button>
@@ -347,7 +347,7 @@ setTimeout(()=>{
       </Link>
 
 {
-  (email.isAdmin)?
+  (email.isAdmin===true)?
   <Link to={'/editaccess'} >
       <Button
       _hover={{ backgroundColor: "black",color:'white' }}
