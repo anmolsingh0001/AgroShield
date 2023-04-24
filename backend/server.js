@@ -130,7 +130,7 @@ app.post("/token", async (req, res) => {
       detail.name = name;
       detail.email = email;
       detail.withgoogle = true;
-  
+      detail.isAdmin=false
       detail.save(async (err, data) => {
         if (err) {
           console.log(err);
@@ -139,6 +139,7 @@ app.post("/token", async (req, res) => {
           const token = jwd.sign({
             email: data.email,
             name: data.name,
+            isAdmin:data.isAdmin,
             _id:data._id,
           }, KEY);
           res.json({ status: "signed in successfully", user: token });
@@ -148,6 +149,7 @@ app.post("/token", async (req, res) => {
       const token = jwd.sign({
         email: check.email,
         name: check.name,
+        isAdmin:check.isAdmin,
         _id:check._id,
       }, KEY);
       res.json({ status: "signed in successfully", user: token });
@@ -164,6 +166,7 @@ app.post("/signup",async (req,res)=>{
     detail.name = name
     detail.email = email
     detail.password = newpassword
+    detail.isAdmin=false
 
 
     detail.save(async (err,data)=>{
@@ -175,6 +178,7 @@ app.post("/signup",async (req,res)=>{
                 email: data.email,
                 name: data.name,
                 _id:data._id,
+                isAdmin:data.isAdmin,
               }, KEY);
               res.json({ status: "signed in successfully", user: token });
         }
@@ -201,6 +205,7 @@ app.post("/login", async (req,res)=>{
             email:check.email,
             password:check.password,
             name:check.name,
+            isAdmin:check.isAdmin,
             _id:check._id
         },KEY)
         res.json({status:"signed in successfully",user:token})
@@ -214,7 +219,8 @@ app.post("/login", async (req,res)=>{
         const token=jwd.sign({
             email:check.email,
             _id:check._id,
-            name:check.name
+            name:check.name,
+            isAdmin:check.isAdmin
         },KEY)
         res.json({status:"signed in successfully",user:token})
     }
@@ -240,6 +246,8 @@ const middleware=(req,res,next)=>{
 }
 
 
+
+
 app.get("/userinput", middleware, async (req, res) => {
     const { cropName } = req.query;
     if (cropName) {
@@ -256,6 +264,41 @@ app.get("/userinput", middleware, async (req, res) => {
     res.json({"error":"please provide data"})
   }
   });
+
+app.delete('/delete/:id',middleware,async (req,res)=>{
+  const id=req.params.id;
+  const isValidObjectId = ObjectId.isValid(id);
+  if (!isValidObjectId) {
+    return res.status(400).send('Invalid ObjectId');
+  }
+  else{
+    const data = await finalcrop.findByIdAndDelete({_id:id});
+    res.send(data);
+    }
+})
+
+app.put('/edit/:id',middleware,async (req,res)=>{
+  const id=req.params.id;
+  const isValidObjectId = ObjectId.isValid(id);
+  if (!isValidObjectId) {
+    return res.status(400).send('Invalid ObjectId');
+  }
+  else{
+    const data = await finalcrop.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: req.body,
+      }
+    );
+    res.send(data);
+    }
+});
+
+app.get('/getuserdata',middleware,async (req,res)=>{
+  const data = await ChannelModel.find();
+  res.json(data);
+})
+
 
 app.put("/image/:id",middleware, async (req, res) => {
     const {image} = req.body;

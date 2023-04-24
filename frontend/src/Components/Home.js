@@ -9,6 +9,7 @@ import { Spinner } from '@chakra-ui/react'
 import NodeContext from '../Context/noteContext';
 import Crausal from './Crausal';
 import { FaPlus } from 'react-icons/fa';
+import jwtDecode from 'jwt-decode';
 
 function Home(props) {
 
@@ -20,15 +21,21 @@ function Home(props) {
   const [dummy,setdummy] = useState([]);
   const [data,nodata] = useState(false);
   const [myquery,setmyquery] = useState([1,2]);
+  const [empty,setempty] = useState(false);
 
-  function checkdata(){
-    if(search.length===0){
-      nodata(true);
-    }
-    else{
-      nodata(false)
-    }
-  }
+  
+
+  
+
+
+
+  setTimeout(()=>{
+    document.getElementById('search').style.display='flex' 
+    document.getElementById('suggest').style.display='flex'
+  },1000)
+  
+
+  
 
  
 
@@ -70,9 +77,18 @@ function Home(props) {
     })
       .then(res=>res.json())
       .then((data)=>{
-        
-        setdummy(data);
+        if(data.length===0){
+          nodata(true)
+          setdummy(data);
+          setloder(false);
+        }
+        if(data.length>0){
+          nodata(false);
+          setdummy(data);
         setloder(false);
+        
+        }
+        
       })
       .catch((err)=>{
         console.log(err);
@@ -91,7 +107,8 @@ function Home(props) {
        
       }
 
-      
+      const email=jwtDecode("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFubW9sLnNpbmdoQGthbHZpdW0uY29tbXVuaXR5IiwicGFzc3dvcmQiOiIkMmEkMTAkekJRb093ZHhIT3lRLkNodldRTS9WZWpqeUNGSFFUelprMk55NVpzVDFERkVjbThKMUxxY1ciLCJuYW1lIjoiQW5tb2wgU2luZ2giLCJpc0FkbWluIjp0cnVlLCJfaWQiOiI2NDQ1ZmI2ZmM2ODA3YjNlNTkwZmFiMTQiLCJpYXQiOjE2ODIzMDg2NDV9.cdIWGjAUtOtANvzwXd1R5gYMJaz3j8GNrYRaWkuxCNY");
+      // console.log("decode",email);
 
 
   
@@ -109,20 +126,11 @@ function Home(props) {
 
     
  
-  setTimeout(()=>{
-    if(search.length===0 && myquery.length===1 ){
-      nodata(true);
-    }
-  },2000)
+ 
 
-  setTimeout(()=>{
-    if(search.length>0  ){
-      nodata(false)
-    }
-  },10)
+  
 
 
-console.log("ljhu",myquery.length)
 
 
 useEffect(() => {
@@ -138,8 +146,10 @@ useEffect(() => {
            return (
             (medicine)?medicine===e.type:e
            )
+         
            
  }));
+
 }
 
 }, [dummy,medicine]);
@@ -153,6 +163,7 @@ function loader(){
       setloder(false);
     },2000)
   }
+
 }
 
 const handlefilter=()=>{
@@ -164,6 +175,38 @@ const handlefilter=()=>{
     document.getElementById('filter').style.display='none'
   }
 }
+
+function Delete(id){
+  if(window.confirm("Do you want to delete the crop")){
+    fetch(`http://localhost:2000/delete/${id}`,{
+    method:'DELETE',
+    headers: {
+      'Authorization': 'Bearer ' + Token,
+      "Content-type": "application/json; charset=UTF-8"
+    }
+  })
+  .then(res=>res.json())
+  .then((data)=>{
+    console.log(data);
+    setsearch((prev) => prev.filter((elt) => elt._id !== id));
+  })
+  .catch()
+  }
+  
+}
+
+
+function Edit(id){
+  navigate(`/edit/${id}`)
+}
+
+setTimeout(()=>{
+  if(data || search.length===0){
+    setempty(true)
+  }
+
+  
+},1000)
 
 
 
@@ -183,37 +226,53 @@ const handlefilter=()=>{
           <Box mr={'1rem'} onClick={()=>{setmedicineType("");loader()}} >
             All
           </Box>
-          <Box mr={'1rem'} onClick={()=>{setmedicineType("Herbicide");loader();nodata(false)}} >
+          <Box mr={'1rem'} onClick={()=>{setmedicineType("Herbicide");loader()}} >
             Herb
           </Box>
-          <Box mr={'1rem'} onClick={()=>{setmedicineType("Insecticide");loader();nodata(false)}} >
+          <Box mr={'1rem'} onClick={()=>{setmedicineType("Insecticide");loader()}} >
             Insect
           </Box>
-          <Box mr={'1rem'} onClick={()=>{setmedicineType("Fungicide");loader();nodata(false)}}  >
+          <Box mr={'1rem'} onClick={()=>{setmedicineType("Fungicide");loader()}}  >
             Fung
           </Box>
-          <Box mr={'1rem'} onClick={()=>{setmedicineType("Bioinsecticide");loader();nodata(false)}} >
+          <Box mr={'1rem'} onClick={()=>{setmedicineType("Bioinsecticide");loader()}} >
             Bio-insect
           </Box>
-          <Box onClick={()=>{setmedicineType("Biofungicide");loader();nodata(false)}}>
+          <Box onClick={()=>{setmedicineType("Biofungicide");loader()}}>
             Bio-fung
           </Box>
         </Flex>
 
  
 
-          {(search.length>0 && !loder )?
+          {(search.length>0 && !loder && !data )?
           <SimpleGrid mt={'10rem'} p="15px" spacing={10} minChildWidth="350px" minHeight={'80vh'} >
           {
+            
             search.map((dat, index)=>{
               return (
                
-                <Card ref={element} id={`${dat._id}`} onClick={()=>{
-                  navigate(`./${dat._id}`)
+                <Card   boxShadow='2xl' p='6' rounded='md' bg='white' key={index} maxW='350px'>
                   
-                  
-                }}  boxShadow='2xl' p='6' rounded='md' bg='white' key={index} maxW='350px'>
-                    <CardBody>
+                {
+                  (email.isAdmin)?
+                  <Flex>
+                    <Flex ml={'5rem'}>
+                    <Button onClick={()=>Edit(dat._id)} fontSize={'1.5rem'}  h={'4rem'} w={'10rem'} >Edit</Button>
+                    </Flex>
+                    <Flex ml={'3rem'} >
+                    <Button onClick={()=>Delete(dat._id)} fontSize={'1.5rem'} h={'4rem'} w={'10rem'} >Delete</Button>
+                    </Flex>
+                  </Flex>:<></>
+                }
+                    <CardBody 
+                    ref={element} id={`${dat._id}`} onClick={()=>{
+                      navigate(`./${dat._id}`)
+                      
+                      
+                    }}
+                    >
+                      
                       {
                         (dat.image)?
                         <Image
@@ -273,9 +332,8 @@ const handlefilter=()=>{
   
   
          </SimpleGrid>:
-         (data)?
-         <Flex justifyContent={'center'} m={'20rem'} fontSize={'3rem'} >Sorry! No data found</Flex>
-:
+         (empty && !loader )?
+         <Flex justifyContent={'center'} m={'20rem'} fontSize={'3rem'} >Sorry! No data found</Flex>:
                         <Flex justifyContent={'center'} m={'22rem'} >
                         <Spinner/>
                         </Flex>
@@ -287,6 +345,17 @@ const handlefilter=()=>{
       borderRadius={'5rem'} h={'6rem'} w={'6rem'} bottom={'5rem'} zIndex={9999} right='4rem' position={'fixed'} leftIcon={<FaPlus/>} >
       </Button>
       </Link>
+
+{
+  (email.isAdmin)?
+  <Link to={'/editaccess'} >
+      <Button
+      _hover={{ backgroundColor: "black",color:'white' }}
+      borderRadius={'5rem'} h={'6rem'} w={'6rem'} top={'5rem'} zIndex={9999} right='4rem' position={'fixed'} leftIcon={<FaPlus/>} >
+      </Button>
+      </Link>:<></>
+}
+      
 
         
       <Button

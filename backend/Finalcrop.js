@@ -42,7 +42,14 @@ const channelModel =  new mongoose.Schema({
             ref:"userdetails",
         }
     }
-    ]
+    ],
+    userEditAccess:[
+        {
+          id:{
+            type:String
+          }
+        }
+      ]
 });
 
 

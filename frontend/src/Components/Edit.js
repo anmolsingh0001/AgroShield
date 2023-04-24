@@ -1,10 +1,10 @@
 import { Flex, Input,Box,Heading,FormControl,FormLabel,Button,  LightMode } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@chakra-ui/react";
 
-function Form() {
+function Edit() {
 
   const [Crop, setcrop] = useState('');
   const [medicine,setmedicine] = useState('');
@@ -19,50 +19,12 @@ function Form() {
    const USERINPUT = process.env.REACT_APP_SECRET_KEY + '/userinput'
     const Token = sessionStorage.getItem("token")
     const name=sessionStorage.getItem('username')
+    const {id} = useParams();
 
-    const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleFileInputChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-  };
 
-  function senddata(Image){
-    
-    fetch(USERINPUT, {
-     
-      // Adding method type
-      method: "POST",
-       
-      // Adding body or contents to send
-      body: JSON.stringify({
-        "cropName":Crop,
-        "diseaseName":diseasename,
-        "solution":medicine,
-        "UserName":name,
-        "type":type,
-        "image":Image,
-    }),
-       
-      // Adding headers to the request
-      headers: {
-        'Authorization': 'Bearer ' + Token,
-          "Content-type": "application/json; charset=UTF-8"
-      }
-  })
-   
-  
-  .then(response => response.json())
-   
-  // Displaying results to console
-  .then(json =>{ 
-    console.log(json)
-    settost(true);
-    setTimeout(()=>{
-      navigate('/home')
-    },2000)
-    
-  });
-  }
+
+
 
   setTimeout(()=>{
     document.getElementById('search').style.display='none' 
@@ -75,31 +37,43 @@ function Form() {
 
 
 
-  const createlink=process.env.REACT_APP_SECRET_KEY+'/createlink'
+
 
   let requestInProgress = false;
 
+
+  const EDITlink = process.env.REACT_APP_SECRET_KEY + `/edit/${id}`
+
   const checkfield = (e) => {
     e.preventDefault();
-    if (Crop !== "" && medicine !== "" && type !== "" && name !== "" && (image !== "" || selectedFile !== "") && diseasename !== "" ) {
-      const fileExtension = image.split(".").pop().toLowerCase();
-      console.log(fileExtension);
-      if ((((fileExtension === "jpg" || fileExtension === "png") && image.length < 100 ) || selectedFile)) {
-        if(!requestInProgress){
-        const formData = new FormData();
-        formData.append("cropImage", selectedFile);
-        formData.append("imageUrl", `${image}`);
+    if (Crop !== "" && medicine !== "" && type !== "" && name !== "" && (image !== "" ) && diseasename !== "" ) {
+     if(!requestInProgress){
+
+     
   
         requestInProgress = true;
   
-        fetch(createlink, {
-          method: "POST",
-          body: formData,
+        fetch(EDITlink, {
+          method: "PUT",
+          body: JSON.stringify({
+            "cropName":Crop,
+            "Disease":diseasename,
+            "solution":medicine,
+            "UserName":name,
+            "type":type,
+            "image":image,
+        }),
+        headers: {
+            'Authorization': 'Bearer ' + Token,
+              "Content-type": "application/json; charset=UTF-8"
+          }
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log(data.imageUrl);
-            senddata(data.imageUrl);
+            settost(true);
+            setTimeout(()=>{
+            navigate('/home')
+            },2000)
             requestInProgress = false;
           })
           .catch((error) => {
@@ -107,15 +81,10 @@ function Form() {
             requestInProgress = false;
           });
         }
-      } else {
-        console.log("Image extension is invalid");
-        alert(
-          "only png and jpg extension is supported and length should be not greater than 100 characters"
-        );
-        setimage("");
-      }
     }
-  };
+      
+    }
+  
   
 
 
@@ -123,8 +92,8 @@ function Form() {
 
   function handleClick() {
     toast({
-      title: "Information ",
-      description: "added successfully",
+      title: "Document ",
+      description: "Edited successfully",
       status: "success",
       position:'top-right',
       duration: 3000,
@@ -139,6 +108,28 @@ function Form() {
     }
   },[tost])
 
+ 
+
+  const API1=process.env.REACT_APP_SECRET_KEY+`/data/${id}`
+
+  useEffect(()=>{
+    fetch(API1,{
+        method:"GET",
+        headers: {
+            'Authorization': 'Bearer ' + Token,
+              "Content-type": "application/json; charset=UTF-8"
+          }
+    }).then(res=>res.json())
+    .then((data)=>{
+        setcrop(data.data[0].cropName);
+        setmedicine(data.data[0].solution);
+        settype(data.data[0].type);
+        setdisease(data.data[0].Disease);
+        setimage(data.data[0].image)
+        
+
+    }).catch(Error=>console.log(Error))
+},[])
 
 
 
@@ -161,7 +152,7 @@ function Form() {
           <form onSubmit={(e)=>checkfield(e)} >
             <FormControl  mb={'10'} >
               <FormLabel fontSize={'20px'} >Crop Name</FormLabel>
-              <Input onChange={(e)=>setcrop(e.target.value)} size={'lg'} h={'16'} placeholder="Enter Crop Name..." />
+              <Input value={Crop} onChange={(e)=>setcrop(e.target.value)} size={'lg'} h={'16'} placeholder="Enter Crop Name..." />
             </FormControl>
 
 
@@ -170,13 +161,13 @@ function Form() {
 
             <FormControl mb={'10'} >
               <FormLabel fontSize={'20px'} >Medicine Name</FormLabel>
-              <Input onChange={(e)=>setmedicine(e.target.value)} h={'16'} type={'text'} size={'lg'}  placeholder="Type Medicine name..." />
+              <Input value={medicine} onChange={(e)=>setmedicine(e.target.value)} h={'16'} type={'text'} size={'lg'}  placeholder="Type Medicine name..." />
             </FormControl>
 
            
             <FormControl  mb={'10'} >
               <FormLabel color={'black'} bg={'white'} fontSize={'20px'}  >Type of Medicine</FormLabel>
-              <select color='black' backgroundcolor="white" onChange={(e)=>settype(e.target.value)} >
+              <select value={type} color='black' backgroundcolor="white" onChange={(e)=>settype(e.target.value)} >
                 <LightMode>
                 <option  value="">Select the type</option>
             <option value="Insecticide">Insecticide</option>
@@ -193,7 +184,7 @@ function Form() {
 
             <FormControl mb={'10'} >
               <FormLabel fontSize={'20px'} >Disease Name</FormLabel>
-              <Input onChange={(e)=>setdisease(e.target.value)} h={'16'} size={'lg'} type={'text'}  placeholder="Type Disease Name..." />
+              <Input value={diseasename} onChange={(e)=>setdisease(e.target.value)} h={'16'} size={'lg'} type={'text'}  placeholder="Type Disease Name..." />
             </FormControl>
 
 
@@ -202,11 +193,7 @@ function Form() {
               <Input value={image} onChange={(e)=>setimage(e.target.value)} h={'16'} size={'lg'} type={'text'}  placeholder="Paste the image link here..." />
             </FormControl>
 
-            <FormControl mb={'10'} >
-              <FormLabel fontSize={'20px'} >Disease Image</FormLabel>
-              <Input type="file" onChange={handleFileInputChange} h={'16'} size={'lg'} placeholder="provide image here..." />
-              {selectedFile && <p>Selected file: {selectedFile.name}</p>}
-            </FormControl>
+        
 
 
 
@@ -231,4 +218,4 @@ function Form() {
   )
 }
 
-export default Form
+export default Edit

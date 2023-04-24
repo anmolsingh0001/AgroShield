@@ -15,6 +15,12 @@ function Data() {
     const {id} = useParams();
     const Token = sessionStorage.getItem("token");
 
+    setTimeout(()=>{
+        document.getElementById('search').style.display='none'   
+        document.getElementById('suggest').style.display='none'
+    },1000)
+
+
 
 
 
@@ -60,13 +66,19 @@ function Data() {
         setSelectedFile(event.target.files[0]);
       };
 
+
+      let requestInProgress = false;
+
     const handleimageinput=()=>{
         if(imagelink!==' '){
 
+            const fileExtension = imagelink.split(".").pop().toLowerCase();
+            if ((((fileExtension === "jpg" || fileExtension === "png") && imagelink.length < 100 ) || selectedFile)) {
+                if(!requestInProgress){
             const formData = new FormData();
-  formData.append('cropImage', selectedFile);
-formData.append('imageUrl', `${imagelink}`);
-
+            formData.append('cropImage', selectedFile);
+            formData.append('imageUrl', `${imagelink}`);
+            requestInProgress = true;
 
     fetch(createlink, {
       method: 'POST',
@@ -74,14 +86,25 @@ formData.append('imageUrl', `${imagelink}`);
     })
     .then(response => response.json())
     .then(data => {
-      console.log(data.imageUrl)
+    //   console.log(data.imageUrl)
       senddata(data.imageUrl);
+      requestInProgress = false;
       
     })
-    .catch(error => console.error(error));
+    .catch((error) => {
+        console.error(error)
+        requestInProgress = false;
+    });
 
-            
-        }
+}  
+        }else {
+            console.log("Image extension is invalid");
+            alert(
+              "only png and jpg extension is supported and length should be not greater than 100 characters"
+            );
+            setimagelink("");
+          }
+    }
     }
 
 
@@ -135,7 +158,7 @@ formData.append('imageUrl', `${imagelink}`);
 
     return (
         <div style={{minHeight:'100vh'}}>
-            <Box mt={'4rem'} display="flex" justifyContent="center" alignItems="center">
+            <Box mt={'6rem'} display="flex" justifyContent="center" alignItems="center">
     
             {
                 (data.length>0)?

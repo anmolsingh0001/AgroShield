@@ -16,6 +16,9 @@ const channelModel =  new mongoose.Schema({
         type:String,Number,
         trim:true,
     },
+    isAdmin:{
+        type:Boolean
+    },
     withgoogle:{
         type:Boolean,
         trim:true,
