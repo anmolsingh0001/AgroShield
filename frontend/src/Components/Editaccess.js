@@ -7,8 +7,10 @@ function Editaccess() {
     const [userdetail,setuserdetail] = useState([]);
 
 
+    const getuserapi=process.env.REACT_APP_SECRET_KEY + `/getuserdata`
+
     useEffect(()=>{
-        fetch('http://localhost:2000/getuserdata',{
+        fetch(getuserapi,{
             method:'GET',
             headers: {
                 'Authorization': 'Bearer ' + Token,
@@ -27,7 +29,7 @@ function Editaccess() {
       },500)
 
       function EditAccess(){
-        
+            
       }
 
   return (

@@ -176,9 +176,11 @@ const handlefilter=()=>{
   }
 }
 
+const deleteapi=process.env.REACT_APP_SECRET_KEY + `/delete/${id}`
+
 function Delete(id){
   if(window.confirm("Do you want to delete the crop")){
-    fetch(`http://localhost:2000/delete/${id}`,{
+    fetch(deleteapi,{
     method:'DELETE',
     headers: {
       'Authorization': 'Bearer ' + Token,
