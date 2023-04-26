@@ -273,7 +273,7 @@ app.delete('/delete/:id',middleware,async (req,res)=>{
   }
   else{
     const data = await finalcrop.findByIdAndDelete({_id:id});
-    res.send(data);
+    res.send("deleted successfully");
     }
 })
 
