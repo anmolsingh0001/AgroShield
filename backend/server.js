@@ -274,10 +274,15 @@ app.delete('/delete/:id',middleware,async (req,res)=>{
   if (!isValidObjectId) {
     return res.status(400).send('Invalid ObjectId');
   }
-  else{
-    const data = await finalcrop.findByIdAndDelete({_id:id});
-    res.send("deleted successfully");
-    }
+
+  console.log(id);
+  
+  const del = await finalcrop.findByIdAndDelete(id);
+  if(!del){
+    return res.status(404).send('Document not found');
+  }
+  res.status(200).json({success:"deleted successfully"});
+    
 })
 
 app.put('/edit/:id',middleware,async (req,res)=>{
