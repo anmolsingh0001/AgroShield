@@ -191,11 +191,7 @@ function Delete(id1){
   })
   .then(res=>res.json())
   .then((data)=>{
-    console.log(data);
-    if(!data){
-      setsearch((prev) => prev.filter((elt) => elt._id !== id));
-    }
-    
+      setsearch((prev) => prev.filter((elt) => elt._id !== id1));    
   })
   .catch()
   }
