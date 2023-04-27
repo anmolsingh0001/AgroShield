@@ -277,7 +277,7 @@ app.delete('/delete/:id',middleware,async (req,res)=>{
   
   const del = await finalcrop.findByIdAndDelete(id);
 
-  res.status(200).json({success:"deleted successfully"});
+  res.json({success:"deleted successfully"});
     
 })
 

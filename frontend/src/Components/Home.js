@@ -180,7 +180,7 @@ const handlefilter=()=>{
 
 function Delete(id1){
   const deleteapi=process.env.REACT_APP_SECRET_KEY + `/delete/${id1}`
-  console.log("id",id1)
+ 
   if(window.confirm("Do you want to delete the crop")){
     fetch(deleteapi,{
     method:'DELETE',
@@ -192,7 +192,10 @@ function Delete(id1){
   .then(res=>res.json())
   .then((data)=>{
     console.log(data);
-    setsearch((prev) => prev.filter((elt) => elt._id !== id));
+    if(!data){
+      setsearch((prev) => prev.filter((elt) => elt._id !== id));
+    }
+    
   })
   .catch()
   }
